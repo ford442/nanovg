@@ -113,8 +113,8 @@ void renderFrame(){
 updateGraph(&fps, dt);
 eglSwapBuffers(display,surface);
 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
-renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
+nvgBeginFrame(vg,   S, S, pxRatio);
+renderDemo(vg, mx,my,    S,S, t, blowup, &data);
 renderGraph(vg, 5,5, &fps);
 nvgEndFrame(vg);
 }
@@ -164,7 +164,7 @@ display=eglGetDisplay(EGL_DEFAULT_DISPLAY);
 eglInitialize(display,&v3,&v0);
 eglChooseConfig(display,attribute_list,&eglconfig,1,&config_size);
 contextegl=eglCreateContext(display,eglconfig,EGL_NO_CONTEXT,anEglCtxAttribs2);
-surface=eglCreateWindowSurface(display,eglconfig,0,attribut_list);
+surface=eglCreateWindowSurface(display,eglconfig,NULL,attribut_list);
 eglMakeCurrent(display,surface,surface,contextegl);
 emscripten_webgl_make_context_current(ctx);
 	
@@ -194,8 +194,8 @@ emscripten_webgl_make_context_current(ctx);
 	//	glfwGetWindowSize(window, &winWidth, &winHeight);
 	//	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		// Calculate pixel ration for hi-dpi devices.
-		pxRatio = (float)fbWidth / (float)winWidth;
-		glViewport(0, 0, fbWidth, fbHeight);
+	//	pxRatio = (float)fbWidth / (float)winWidth;
+		glViewport(0, 0, S, S);
 		glClearColor(0.3f, 0.3f, 0.32f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 		glEnable(GL_BLEND);
