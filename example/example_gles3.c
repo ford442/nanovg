@@ -99,6 +99,16 @@ EGL_BUFFER_SIZE,32,
 EGL_NONE
 };
 
+	double mx, my, t, dt;
+		int winWidth, winHeight;
+		int fbWidth, fbHeight;
+		float pxRatio;
+
+	DemoData data;
+	NVGcontext* vg = NULL;
+	PerfGraph fps;
+	double prevt = 0;
+
 void renderFrame(){
 eglSwapBuffers(display,surface);
 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -111,10 +121,7 @@ nvgEndFrame(vg);
 int main()
 {
 //	GLFWwindow* window;
-	DemoData data;
-	NVGcontext* vg = NULL;
-	PerfGraph fps;
-	double prevt = 0;
+
 
 //	if (!glfwInit()) {
 //		printf("Failed to init GLFW.");
@@ -177,10 +184,7 @@ emscripten_webgl_make_context_current(ctx);
 
 //	while (!glfwWindowShouldClose(window))
 //	{
-		double mx, my, t, dt;
-		int winWidth, winHeight;
-		int fbWidth, fbHeight;
-		float pxRatio;
+	
 
 	//	t = glfwGetTime();
 		dt = t - prevt;
