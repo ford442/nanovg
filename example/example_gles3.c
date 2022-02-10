@@ -170,13 +170,13 @@ emscripten_webgl_make_context_current(ctx);
 	
 	
 	vg = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
-	if (vg == NULL) {
-		printf("Could not init nanovg.\n");
-		return -1;
-	}
+//	if (vg == NULL) {
+//		printf("Could not init nanovg.\n");
+//		return -1;
+//	}
 
-	if (loadDemoData(vg, &data) == -1)
-		return -1;
+//	if (loadDemoData(vg, &data) == -1)
+//		return -1;
 
 //	glfwSwapInterval(0);
 
@@ -194,7 +194,7 @@ emscripten_webgl_make_context_current(ctx);
 	//	glfwGetWindowSize(window, &winWidth, &winHeight);
 	//	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		// Calculate pixel ration for hi-dpi devices.
-	//	pxRatio = (float)fbWidth / (float)winWidth;
+		pxRatio = (float)fbWidth / (float)winWidth;
 		glViewport(0, 0, fbWidth, fbHeight);
 		glClearColor(0.3f, 0.3f, 0.32f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
