@@ -110,6 +110,7 @@ EGL_NONE
 	double prevt = 0;
 
 void renderFrame(){
+updateGraph(&fps, dt);
 eglSwapBuffers(display,surface);
 glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
@@ -187,9 +188,8 @@ emscripten_webgl_make_context_current(ctx);
 	
 
 	//	t = glfwGetTime();
-		dt = t - prevt;
-		prevt = t;
-		updateGraph(&fps, dt);
+	//	dt = t - prevt;
+	//	prevt = t;
 	//	glfwGetCursorPos(window, &mx, &my);
 	//	glfwGetWindowSize(window, &winWidth, &winHeight);
 	//	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
