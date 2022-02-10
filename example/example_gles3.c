@@ -43,10 +43,6 @@ void errorcb(int error, const char* desc)
 //	printf("GLFW error %d: %s\n", error, desc);
 }
 
-int blowup = 0;
-int screenshot = 0;
-int premult = 0;
-
 /*
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -62,7 +58,10 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 		premult = !premult;
 }
 */
-
+GLsizei S;
+int blowup = 0;
+int screenshot = 0;
+int premult = 0;
 EGLDisplay display;
 EGLSurface surface;
 EGLContext contextegl;
@@ -71,6 +70,34 @@ EGLConfig eglconfig=NULL;
 EmscriptenWebGLContextAttributes attr;
 EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx;
 EGLint v0=0,v1=1,v2=2,v3=3,v4=4,v6=6,v8=8,v32=32,a,b;
+const EGLint attribut_list[]={ 
+EGL_GL_COLORSPACE_KHR,EGL_GL_COLORSPACE_SRGB_KHR,
+EGL_NONE};
+const EGLint anEglCtxAttribs2[]={
+EGL_CONTEXT_CLIENT_VERSION,3,
+EGL_CONTEXT_MINOR_VERSION_KHR,0,
+// EGL_COLOR_COMPONENT_TYPE_EXT,EGL_COLOR_COMPONENT_TYPE_FLOAT_EXT,
+EGL_CONTEXT_PRIORITY_LEVEL_IMG,EGL_CONTEXT_PRIORITY_REALTIME_NV,
+EGL_CONTEXT_FLAGS_KHR,EGL_CONTEXT_OPENGL_FORWARD_COMPATIBLE_BIT_KHR,
+EGL_CONTEXT_FLAGS_KHR,EGL_CONTEXT_OPENGL_ROBUST_ACCESS_BIT_KHR,
+EGL_NONE};
+const EGLint attribute_list[]={
+// EGL_COLOR_COMPONENT_TYPE_EXT,EGL_COLOR_COMPONENT_TYPE_FLOAT_EXT,
+EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR,EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR,
+EGL_RENDERABLE_TYPE,EGL_OPENGL_ES3_BIT,
+EGL_CONTEXT_OPENGL_ROBUST_ACCESS_EXT,EGL_TRUE,
+EGL_DEPTH_ENCODING_NV,EGL_DEPTH_ENCODING_NONLINEAR_NV,
+EGL_RENDER_BUFFER,EGL_QUADRUPLE_BUFFER_NV,
+// EGL_CONTEXT_OPENGL_FORWARD_COMPATIBLE,EGL_TRUE,
+EGL_RED_SIZE,8,
+EGL_GREEN_SIZE,8,
+EGL_BLUE_SIZE,8,
+EGL_ALPHA_SIZE,8,
+EGL_DEPTH_SIZE,24,
+EGL_STENCIL_SIZE,8,
+EGL_BUFFER_SIZE,32,
+EGL_NONE
+};
 
 void renderFrame(){
 eglSwapBuffers(display,surface);
@@ -80,8 +107,6 @@ renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
 renderGraph(vg, 5,5, &fps);
 nvgEndFrame(vg);
 }
-
-
 
 int main()
 {
