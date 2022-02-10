@@ -20,7 +20,6 @@
 
 #define GLFW_INCLUDE_ES3
 #define GLFW_INCLUDE_GLEXT
-#include <GLFW/glfw3.h>
 
 #include "nanovg.h"
 #include "nanovg_gl.h"
@@ -31,7 +30,7 @@
 
 void errorcb(int error, const char* desc)
 {
-	printf("GLFW error %d: %s\n", error, desc);
+//	printf("GLFW error %d: %s\n", error, desc);
 }
 
 int blowup = 0;
@@ -40,6 +39,7 @@ int premult = 0;
 
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	/*
 	NVG_NOTUSED(scancode);
 	NVG_NOTUSED(mods);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -50,39 +50,40 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 		screenshot = 1;
 	if (key == GLFW_KEY_P && action == GLFW_PRESS)
 		premult = !premult;
+	*/
 }
 
 int main()
 {
-	GLFWwindow* window;
+//	GLFWwindow* window;
 	DemoData data;
 	NVGcontext* vg = NULL;
 	PerfGraph fps;
 	double prevt = 0;
 
-	if (!glfwInit()) {
-		printf("Failed to init GLFW.");
-		return -1;
-	}
+//	if (!glfwInit()) {
+//		printf("Failed to init GLFW.");
+//		return -1;
+//	}
 
 	initGraph(&fps, GRAPH_RENDER_FPS, "Frame Time");
 
-	glfwSetErrorCallback(errorcb);
+//	glfwSetErrorCallback(errorcb);
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+//	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-	window = glfwCreateWindow(1000, 600, "NanoVG", NULL, NULL);
+//	window = glfwCreateWindow(1000, 600, "NanoVG", NULL, NULL);
 //	window = glfwCreateWindow(1000, 600, "NanoVG", glfwGetPrimaryMonitor(), NULL);
-	if (!window) {
-		glfwTerminate();
-		return -1;
-	}
+//	if (!window) {
+//		glfwTerminate();
+//		return -1;
+//	}
 
-	glfwSetKeyCallback(window, key);
+//	glfwSetKeyCallback(window, key);
 
-	glfwMakeContextCurrent(window);
+//	glfwMakeContextCurrent(window);
 
 	vg = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 	if (vg == NULL) {
@@ -93,10 +94,10 @@ int main()
 	if (loadDemoData(vg, &data) == -1)
 		return -1;
 
-	glfwSwapInterval(0);
+//	glfwSwapInterval(0);
 
-	glfwSetTime(0);
-	prevt = glfwGetTime();
+//	glfwSetTime(0);
+//	prevt = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -105,14 +106,14 @@ int main()
 		int fbWidth, fbHeight;
 		float pxRatio;
 
-		t = glfwGetTime();
+	//	t = glfwGetTime();
 		dt = t - prevt;
 		prevt = t;
 		updateGraph(&fps, dt);
 
-		glfwGetCursorPos(window, &mx, &my);
-		glfwGetWindowSize(window, &winWidth, &winHeight);
-		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+	//	glfwGetCursorPos(window, &mx, &my);
+	//	glfwGetWindowSize(window, &winWidth, &winHeight);
+	//	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		// Calculate pixel ration for hi-dpi devices.
 		pxRatio = (float)fbWidth / (float)winWidth;
 
@@ -143,14 +144,14 @@ int main()
 			saveScreenShot(fbWidth, fbHeight, premult, "dump.png");
 		}
 		
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+//		glfwSwapBuffers(window);
+//		glfwPollEvents();
 	}
 
 	freeDemoData(vg, &data);
 
 	nvgDeleteGLES3(vg);
 
-	glfwTerminate();
+//	glfwTerminate();
 	return 0;
 }
