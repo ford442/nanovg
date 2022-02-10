@@ -37,7 +37,11 @@
 #endif
 
 #ifdef NANOVG_GLES3
-#  include <GLES3/gl3.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl31.h>
+#include <GLES3/gl32.h>
+#define __gl2_h_
+#include <GLES2/gl2ext.h>
 #endif
 
 #if defined(NANOVG_GL2) || defined(NANOVG_GL3)
