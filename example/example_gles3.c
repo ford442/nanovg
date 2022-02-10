@@ -21,6 +21,11 @@
 #define GLFW_INCLUDE_ES3
 #define GLFW_INCLUDE_GLEXT
 
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
 #include "nanovg.h"
 #include "nanovg_gl.h"
 #include "nanovg_gl_utils.h"
@@ -37,9 +42,9 @@ int blowup = 0;
 int screenshot = 0;
 int premult = 0;
 
+/*
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	/*
 	NVG_NOTUSED(scancode);
 	NVG_NOTUSED(mods);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -50,8 +55,28 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 		screenshot = 1;
 	if (key == GLFW_KEY_P && action == GLFW_PRESS)
 		premult = !premult;
-	*/
 }
+*/
+
+EGLDisplay display;
+EGLSurface surface;
+EGLContext contextegl;
+EGLint config_size,major,minor;
+EGLConfig eglconfig=NULL;
+EmscriptenWebGLContextAttributes attr;
+EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx;
+EGLint v0=0,v1=1,v2=2,v3=3,v4=4,v6=6,v8=8,v32=32,a,b;
+
+void renderFrame(){
+eglSwapBuffers(display,surface);
+glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
+renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
+renderGraph(vg, 5,5, &fps);
+nvgEndFrame(vg);
+}
+
+
 
 int main()
 {
@@ -69,22 +94,43 @@ int main()
 	initGraph(&fps, GRAPH_RENDER_FPS, "Frame Time");
 
 //	glfwSetErrorCallback(errorcb);
-
 //	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 //	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 //	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
 //	window = glfwCreateWindow(1000, 600, "NanoVG", NULL, NULL);
 //	window = glfwCreateWindow(1000, 600, "NanoVG", glfwGetPrimaryMonitor(), NULL);
 //	if (!window) {
 //		glfwTerminate();
 //		return -1;
 //	}
-
 //	glfwSetKeyCallback(window, key);
-
 //	glfwMakeContextCurrent(window);
-
+	
+eglBindAPI(EGL_OPENGL_ES_API);
+S=EM_ASM_INT({return parseInt(document.getElementById('pmhig').innerHTML,10);});
+emscripten_webgl_init_context_attributes(&attr);
+attr.alpha=EM_TRUE;
+attr.stencil=EM_TRUE;
+attr.depth=EM_TRUE;
+attr.antialias=EM_FALSE;
+attr.premultipliedAlpha=EM_FALSE;
+attr.preserveDrawingBuffer=EM_FALSE;
+attr.enableExtensionsByDefault=EM_FALSE;
+attr.renderViaOffscreenBackBuffer=EM_FALSE;
+attr.powerPreference=EM_WEBGL_POWER_PREFERENCE_DEFAULT;
+attr.failIfMajorPerformanceCaveat=EM_FALSE;
+attr.majorVersion=2;
+attr.minorVersion=0;
+ctx=emscripten_webgl_create_context("#canvas",&attr);
+display=eglGetDisplay(EGL_DEFAULT_DISPLAY);
+eglInitialize(display,&v3,&v0);
+eglChooseConfig(display,attribute_list,&eglconfig,1,&config_size);
+contextegl=eglCreateContext(display,eglconfig,EGL_NO_CONTEXT,anEglCtxAttribs2);
+surface=eglCreateWindowSurface(display,eglconfig,NULL,attribut_list);
+eglMakeCurrent(display,surface,surface,contextegl);
+emscripten_webgl_make_context_current(ctx);
+	
+	
 	vg = nvgCreateGLES3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 	if (vg == NULL) {
 		printf("Could not init nanovg.\n");
@@ -99,8 +145,8 @@ int main()
 //	glfwSetTime(0);
 //	prevt = glfwGetTime();
 
-	while (!glfwWindowShouldClose(window))
-	{
+//	while (!glfwWindowShouldClose(window))
+//	{
 		double mx, my, t, dt;
 		int winWidth, winHeight;
 		int fbWidth, fbHeight;
@@ -110,48 +156,32 @@ int main()
 		dt = t - prevt;
 		prevt = t;
 		updateGraph(&fps, dt);
-
 	//	glfwGetCursorPos(window, &mx, &my);
 	//	glfwGetWindowSize(window, &winWidth, &winHeight);
 	//	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		// Calculate pixel ration for hi-dpi devices.
 		pxRatio = (float)fbWidth / (float)winWidth;
-
-		// Update and render
 		glViewport(0, 0, fbWidth, fbHeight);
-		if (premult)
-			glClearColor(0,0,0,0);
-		else
-			glClearColor(0.3f, 0.3f, 0.32f, 1.0f);
+		glClearColor(0.3f, 0.3f, 0.32f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
-
-		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
-
-		renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
-		renderGraph(vg, 5,5, &fps);
-
-		nvgEndFrame(vg);
-
+		
+		emscripten_set_main_loop((void(*)())renderFrame,0,0);
 		glEnable(GL_DEPTH_TEST);
 
-		if (screenshot) {
-			screenshot = 0;
-			saveScreenShot(fbWidth, fbHeight, premult, "dump.png");
-		}
-		
+	//	if (screenshot) {
+	//		screenshot = 0;
+	//		saveScreenShot(fbWidth, fbHeight, premult, "dump.png");
+	//	}
 //		glfwSwapBuffers(window);
 //		glfwPollEvents();
-	}
+//	}
 
 	freeDemoData(vg, &data);
-
 	nvgDeleteGLES3(vg);
-
 //	glfwTerminate();
 	return 0;
 }
